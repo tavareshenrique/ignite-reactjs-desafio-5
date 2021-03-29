@@ -3,6 +3,9 @@ import Prismic from '@prismicio/client';
 
 import { getPrismicClient } from '../services/prismic';
 
+import Header from '../components/Header';
+import HomePost from '../components/HomePost';
+
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 
@@ -26,7 +29,19 @@ interface HomeProps {
 }
 
 export default function Home() {
-  return <h1>Ola</h1>;
+  return (
+    <div className={styles.container}>
+      <div className={styles.containerHeader}>
+        <Header />
+      </div>
+
+      <main className={styles.content}>
+        <HomePost />
+        <HomePost />
+        <HomePost />
+      </main>
+    </div>
+  );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
@@ -35,8 +50,6 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query([
     Prismic.predicates.at('document.type', 'post'),
   ]);
-
-  console.log(postsResponse);
 
   return {
     props: {
