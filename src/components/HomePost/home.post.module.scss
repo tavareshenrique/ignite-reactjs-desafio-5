@@ -6,4 +6,8 @@
     padding: 8px 0;
     color: #BBBBBB;
   }
+
+  &:hover h2 {
+    color: var(--pink);
+  }
 }

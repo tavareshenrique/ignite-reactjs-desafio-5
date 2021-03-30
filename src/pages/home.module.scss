@@ -1,20 +1,19 @@
-.container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 2rem;
-
+.homeFooter {
+  width: 50%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
-}
+  padding: 24px 0;
 
-.containerHeader {
-  width: 60%;
-}
-
-
-.content {
-  width: 60%;
+  button {
+    background: none;
+    color: var(--pink);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: inherit;
+    font-weight: 700;
+  }
 }

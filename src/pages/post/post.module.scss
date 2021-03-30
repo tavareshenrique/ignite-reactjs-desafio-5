@@ -1,1 +1,44 @@
-// TODO
+img.banner {
+  margin: 2rem auto 0;
+  width: 100%;
+  height: 400px;
+  object-fit: fill;
+}
+
+.mainPost {
+  padding: 80px 0 !important;
+
+  main {
+    h1 {
+      font-size: 2.5rem;
+    }
+  }
+
+  article {
+    margin: 3rem auto 0;
+
+    strong {
+      font-size: 2.5rem;
+      line-height: 1.5rem;
+    }
+
+    p {
+      color: var(--info);
+      margin-top: 1.5rem;
+      text-align: justify;
+    }
+
+    ul {
+      color: var(--info);
+      margin-top: 1.5rem;
+      text-align: justify;
+    }
+  }
+
+}
+
+.infoPost {
+  padding: 24px 0;
+}
+
+
