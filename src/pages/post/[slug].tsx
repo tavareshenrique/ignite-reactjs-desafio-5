@@ -54,7 +54,7 @@ export default function Post({ post }: PostProps) {
     <>
       <div className={commonStyles.container}>
         <div className={commonStyles.containerHeader}>
-          <Header />
+          <Header pageTitle={post.data.title} />
         </div>
       </div>
 
@@ -90,6 +90,7 @@ export default function Post({ post }: PostProps) {
           {post.data.content.map(content => (
             <article key={content.heading}>
               <strong>{content?.heading}</strong>
+
               {content.body.map((body, index) => {
                 const key = index;
 
