@@ -32,7 +32,36 @@ img.banner {
       text-align: justify;
     }
   }
+}
 
+.predictPosts {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  justify-content: space-between;
+
+  border-top: 1px solid rgba(#D7D7D7, 10%);
+
+  margin-top: 2rem;
+  padding: 4rem 0;
+
+  .postItem {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+    font-size: 1.1rem;
+  a {
+    color: #FF57B2;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  &.prev {
+    text-align: left;
+  }
+  &.next {
+    text-align: right;
+  }
+  }
 }
 
 .infoPost {

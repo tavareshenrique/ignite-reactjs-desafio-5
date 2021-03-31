@@ -1,4 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { RichText } from 'prismic-dom';
@@ -10,6 +11,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 
 import Header from '../../components/Header';
+import { Comments } from '../../components/Coments';
 
 import { getPrismicClient } from '../../services/prismic';
 
@@ -18,7 +20,10 @@ import styles from './post.module.scss';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
+  uid: string;
   data: {
+    uid: string;
     title: string;
     banner: {
       url: string;
@@ -36,9 +41,17 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  prevPost: Post | undefined;
+  nextPost: Post | undefined;
+  wasEdited: boolean;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({
+  post,
+  nextPost,
+  prevPost,
+  wasEdited,
+}: PostProps) {
   const router = useRouter();
 
   const readTime = post.data.content.reduce((sumTotal, content) => {
@@ -87,6 +100,23 @@ export default function Post({ post }: PostProps) {
             </div>
           </section>
 
+          {wasEdited && (
+            <section className={commonStyles.info}>
+              <div>
+                <span>
+                  * editado em{' '}
+                  {format(
+                    new Date(post.first_publication_date),
+                    "dd MMM yyyy, 'às' HH:mm:ss",
+                    {
+                      locale: ptBR,
+                    }
+                  )}
+                </span>
+              </div>
+            </section>
+          )}
+
           {post.data.content.map(content => (
             <article key={content.heading}>
               <strong>{content?.heading}</strong>
@@ -104,28 +134,33 @@ export default function Post({ post }: PostProps) {
               })}
             </article>
           ))}
+
+          <div className={styles.predictPosts}>
+            <div className={`${styles.postItem} ${styles.prev}`}>
+              {prevPost && (
+                <>
+                  <div className={styles.title}>{prevPost.data.title}</div>
+                  <Link key={prevPost.uid} href={`/post/${prevPost.uid}`}>
+                    <a>Post anterior</a>
+                  </Link>
+                </>
+              )}
+            </div>
+            <div className={`${styles.postItem} ${styles.next}`}>
+              {nextPost && (
+                <>
+                  <div className={styles.title}>{nextPost.data.title}</div>
+                  <Link key={prevPost.uid} href={`/post/${nextPost.uid}`}>
+                    <a>Próximo post</a>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </main>
 
         <footer className={`${commonStyles.content} ${styles.postFooter}`}>
-          <section
-            ref={elem => {
-              if (!elem) {
-                return;
-              }
-              const scriptElem = document.createElement('script');
-              scriptElem.src = 'https://utteranc.es/client.js';
-              scriptElem.async = true;
-              scriptElem.crossOrigin = 'anonymous';
-              scriptElem.setAttribute(
-                'repo',
-                'tavareshenrique/ignite-reactjs-desafio-5'
-              );
-              scriptElem.setAttribute('issue-term', 'pathname');
-              scriptElem.setAttribute('label', 'blog-comment');
-              scriptElem.setAttribute('theme', 'dark-blue');
-              elem.appendChild(scriptElem);
-            }}
-          />
+          <Comments />
         </footer>
       </div>
     </>
@@ -159,9 +194,31 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('post', String(slug), {});
 
+  const wasEdited =
+    response.last_publication_date > response.first_publication_date;
+
+  const nextPost = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'post')],
+    {
+      pageSize: 1,
+      after: `${response.id}`,
+      orderings: '[document.first_publication_date]',
+    }
+  );
+
+  const prevPost = await prismic.query(
+    [Prismic.Predicates.at('document.type', 'post')],
+    {
+      pageSize: 1,
+      after: `${response.id}`,
+      orderings: '[document.first_publication_date desc]',
+    }
+  );
+
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
+    last_publication_date: response.last_publication_date,
     data: {
       title: response.data.title,
       subtitle: response.data.subtitle,
@@ -187,7 +244,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       post,
+      prevPost: prevPost?.results[0] || null,
+      nextPost: nextPost?.results[0] || null,
+      wasEdited,
     },
-    revalidate: 60 * 60 * 24,
+    revalidate: 3600, // 1 hour
   };
 };
